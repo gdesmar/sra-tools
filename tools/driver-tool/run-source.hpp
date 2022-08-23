@@ -87,7 +87,7 @@ public:
             }
         private:
             friend accession;
-            
+
             explicit const_iterator(accession const *parent, unsigned index)
             : parent(parent)
             , index(index)
@@ -124,22 +124,22 @@ private:
 public:
     accession operator [](std::string const &name) const {
         auto const fnd = queryInfo.find(name);
-        assert(fnd != queryInfo.end());
+        //assert(fnd != queryInfo.end());
         if (fnd != queryInfo.end())
             return accession(fnd->second);
         throw std::out_of_range(name + " is not in the set.");
     }
-    
+
     /// @brief informative only
     std::string const &ce_token() const {
         return ce_token_;
     }
-    
+
     /// @brief set/unset CE Token environment variable
     void set_ce_token_env_var() const;
 
     void set_param_bits_env_var(uint64_t bits) const;
-    
+
     static void preferNoQual();
 
     struct QualityPreference {

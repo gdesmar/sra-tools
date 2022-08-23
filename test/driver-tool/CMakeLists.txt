@@ -22,7 +22,8 @@
 #
 # ===========================================================================
 
-include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/../../tools/driver-tool)
+set( TOOLDIR ${CMAKE_CURRENT_SOURCE_DIR}/../../tools/driver-tool )
+include_directories( ${TOOLDIR} )
 
 AddExecutableTest( Test_Drivertool_JsonParsing "test-json-parse.cpp" "" "")
 AddExecutableTest( Test_Drivertool_SDLResponse "test-sdl-response.cpp" "" "")
@@ -36,6 +37,8 @@ if ( WIN32 )
     add_test( NAME Test_Drivertool_Win32_Args_Parsing COMMAND Drivertool_Win32_Args_Parsing_Test )
 else ()
 	AddExecutableTest( Test_Drivertool_FilePath "test-filepath.cpp" "${COMMON_LINK_LIBRARIES};${COMMON_LIBS_READ}" "")
+	AddExecutableTest( Test_Drivertool_RunSource "test-run-source.cpp;${TOOLDIR}/run-source.cpp;${TOOLDIR}/config.cpp;${TOOLDIR}/command-line.cpp;${TOOLDIR}/SDL-response.cpp;${TOOLDIR}/file-path.posix.cpp;${TOOLDIR}/json-parse.cpp;${TOOLDIR}/build-version.cpp;${TOOLDIR}/tool-args.cpp;" "${COMMON_LINK_LIBRARIES};${COMMON_LIBS_READ}" "")
+
 	# GOOD
 	function( DriverToolGoodTest test_name tool_name )
 		add_test( NAME ${test_name}

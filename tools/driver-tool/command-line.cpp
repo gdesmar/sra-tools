@@ -138,7 +138,7 @@ CommandLine::CommandLine(int argc, char **argv, char **envp, char **extra)
 #else
     versionFromName = Version::fromName(realName);
     runAsVersion = Version::fromName(baseName);
-#endif 
+#endif
 
     toolName = baseName;
     {
@@ -151,8 +151,9 @@ CommandLine::CommandLine(int argc, char **argv, char **envp, char **extra)
     if (fakeName)
         toolName = fakeName;
 #endif
-
+std::cout<<"into getToolPath()"<<std::endl;
     toolPath = getToolPath();
+std::cout<<"out of getToolPath()"<<std::endl;
 }
 
 CommandLine::~CommandLine() {
@@ -173,8 +174,11 @@ FilePath CommandLine::getToolPath() const {
     auto result = fullPath.append(origToolName);
 #else
     auto const versString = versionFromU32(versionFromName, runAsVersion, buildVersion);
+
+std::cout<<"into append()"<<std::endl;
     auto result = fullPath.append(FilePath(toolName + "-orig." + versString));
-    
+std::cout<<"out of append()"<<std::endl;
+
     if (!result.executable()) {
         result.removeSuffix(versString.size() + 1); // remove version
 #if DEBUG || _DEBUGGING
@@ -184,21 +188,24 @@ FilePath CommandLine::getToolPath() const {
 #endif
     }
 #endif // !WINDOWS
-    return result;
+    return std::move(result);
 }
 
 #if WINDOWS
 #else
 char const *CommandLine::getFakeName() const
 {
-    auto const name = "SRATOOLS_IMPERSONATE";
-    for (auto cur = envp; *cur; ++cur) {
-        auto entry = *cur;
-        for (auto i = 0; ; ++i) {
-            if (name[i] == '\0' && entry[i] == '=')
-                return entry + i + 1;
-            if (name[i] != entry[i])
-                break;
+    if ( envp != nullptr )
+    {
+        auto const name = "SRATOOLS_IMPERSONATE";
+        for (auto cur = envp; *cur; ++cur) {
+            auto entry = *cur;
+            for (auto i = 0; ; ++i) {
+                if (name[i] == '\0' && entry[i] == '=')
+                    return entry + i + 1;
+                if (name[i] != entry[i])
+                    break;
+            }
         }
     }
     return nullptr;

@@ -38,6 +38,7 @@
 #include <system_error>
 #include <cstring>
 #include <cassert>
+#include <iostream>
 
 #include <unistd.h>
 
@@ -47,58 +48,28 @@ struct FilePath {
 
     /// creates a non-owning object
     FilePath(FilePath const &other)
-    : path(other.path)
-    , length(other.length)
-    , owns(false)
-    , isCwd(other.isCwd)
-    {}
-
-    FilePath &operator= (FilePath const &other) {
-        assert(other.owns == false); // this needs to be a move assignment
-
-        auto const oldpath = owns ? path : nullptr;
-        owns = false;
-        path = other.path;
-        length = other.length;
-        isCwd = other.isCwd;
-
-        if (oldpath) {
-            assert(oldpath != path);
-            free(oldpath);
-        }
-
-        return *this;
-    }
-
-    /// other loses any ownership it may have had
-    FilePath(FilePath &&other)
-    : path(other.path)
-    , length(other.length)
-    , owns(other.owns)
+    : length(other.length)
+    , owns(true)
     , isCwd(other.isCwd)
     {
-        other.owns = false;
+        path = (char*)malloc( length + 1 );
+        memmove( path, other.path, length );
+        path[length] = 0;
     }
-    FilePath &operator= (FilePath &&other) {
-        if (!other.owns)
-            return *this = (FilePath const &)other;
 
-        auto const oldpath = owns ? path : nullptr;
-        path = other.path;
-        length = other.length;
-        owns = true;
-        isCwd = other.isCwd;
-        other.owns = false;
-
-        if (oldpath && oldpath != path)
-            free(oldpath);
-
+    FilePath &operator= (FilePath const &other) {
+        if ( this != &other  )
+        {
+            free(path);
+            path = NULL;
+            *this = FilePath( other );
+        }
         return *this;
     }
 
     ~FilePath() {
-        if (owns)
-            free(path);
+std::cout<<"~FilePath("<< (void*)path << ")" << std::endl;
+        free(path);
     }
     char const *get() const { return path; }
 

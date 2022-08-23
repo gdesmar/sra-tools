@@ -64,9 +64,13 @@ namespace sratools {
 
 opt_string Config::get(const char *const key) const
 {
-    String *value = NULL;
-    KConfigReadString((KConfig *)obj, key, &value);
-    return makeFromKString(value);
+    if ( obj )
+    {
+        String *value = NULL;
+        KConfigReadString((KConfig *)obj, key, &value);
+        return makeFromKString(value);
+    }
+    return opt_string();
 }
 
 bool Config::noInstallID() const
